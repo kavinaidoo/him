@@ -5,7 +5,7 @@ HIM monitors utility inputs to the home.
 ---
 
 ### Implemented Features
-* Water Pressure Sensing
+* Water Pressure Monitoring
 * Sending data to Adafruit IO
 
 ---
