@@ -16,7 +16,7 @@
 # --------------- Dependency Versions
 
 '''
-CircuitPython (MIT) -> adafruit-circuitpython-raspberry_pi_pico_w-en_GB-8.2.8.uf2 - https://circuitpython.org/board/raspberry_pi_pico_w/
+CircuitPython (MIT) -> adafruit-circuitpython-raspberry_pi_pico-en_US-8.2.9.uf2 - https://circuitpython.org/board/raspberry_pi_pico_w/
 '''
 
 # --------------- Import Section
@@ -85,7 +85,7 @@ try: # Connect to WiFi
     pool = socketpool.SocketPool(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
 except Exception as error: # any error
-    time.sleep(15)
+    time.sleep(30)
     microcontroller.reset() # reboot pico
 
 io = IO_HTTP(aio_username, aio_key, requests) # Initialize an Adafruit IO HTTP API object
@@ -100,7 +100,7 @@ try: # try to send data to AIO
     led.value = False  # Turn off the LED to indicate data sending is complete.
     
 except Exception as error: # any error
-    time.sleep(15)
+    time.sleep(30)
     microcontroller.reset() # reboot pico
 
 gc.collect() # running garbage collection
@@ -136,7 +136,10 @@ if last_4_val[0] > 0 and last_4_val[1] == 0 and last_4_val[2] == 0 and last_4_va
     headers = {"Tags": "red_circle", "Title": "WPM"}
 
 if notification_text:
-    requests.post("https://ntfy.sh/"+ntfy_topic,data=notification_text,headers=headers)
+    try:
+        requests.post("https://ntfy.sh/"+ntfy_topic,data=notification_text,headers=headers)
+    except:
+        pass
 
 #send_io_data(aio_debug_feed_name,"["+",".join(map(str, last_4_val))+"]"+" - "+notification_text) #sends data to debug-log AIO feed
              
