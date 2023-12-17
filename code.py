@@ -16,7 +16,7 @@
 # --------------- Dependency Versions
 
 '''
-CircuitPython (MIT) -> adafruit-circuitpython-raspberry_pi_pico-en_US-8.2.9.uf2 - https://circuitpython.org/board/raspberry_pi_pico_w/
+CircuitPython (MIT) -> adafruit-circuitpython-raspberry_pi_pico_w-en_US-8.2.9.uf2 - https://circuitpython.org/board/raspberry_pi_pico_w/
 '''
 
 # --------------- Import Section
