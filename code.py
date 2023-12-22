@@ -120,7 +120,7 @@ try: # try statement encapsulates entire code
         led.value = True  # Turn on the LED to indicate data is being sent.
         send_io_data(aio_data_feed_name, f"{pressure_kpa:.2f}")
         print("- Sending to AIO succeeded, waiting for 30s")
-        #remove_comment time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
+        time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
         led.value = False  # Turn off the LED to indicate data sending is complete.
         
     except Exception as error: # any error
@@ -191,7 +191,7 @@ try: # try statement encapsulates entire code
     requests = adafruit_requests.Session(pool, ssl.create_default_context())
     
     gc.collect() # running garbage collection
-    print("* Free memory after last_4_val logic - "+str(gc.mem_free()))
+    print("* Free memory after del and recreate pool and requests - "+str(gc.mem_free()))
     
     if notification_text: # if any of the above criteria have been matched
         print("- Notification to be sent -> "+notification_text)
@@ -241,12 +241,12 @@ try: # try statement encapsulates entire code
 
     led.value = False # Turn off LED for deep sleep.
     print("Going to sleep now, good night :)")
-    #remove_comment time_alarm = alarm.time.TimeAlarm(monotonic_time=(time.monotonic() + 300)) # 300 (5 min) / 60 (1 min) Timer
-    #remove_comment alarm.exit_and_deep_sleep_until_alarms(time_alarm) # Exit and set the alarm to wake up.
+    time_alarm = alarm.time.TimeAlarm(monotonic_time=(time.monotonic() + 300)) # 300 (5 min) / 60 (1 min) Timer
+    alarm.exit_and_deep_sleep_until_alarms(time_alarm) # Exit and set the alarm to wake up.
 
 except Exception as error: # any error anywhere in the code
     print("Error in code, resetting in 30s vvv")
     print(error)
     time.sleep(30)
-    #remove_comment microcontroller.reset() # reboot pico
+    microcontroller.reset() # reboot pico
 
