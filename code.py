@@ -183,6 +183,13 @@ try: # try statement encapsulates entire code
         pushalert_title = '🔴WPM'
     
     del last_4_val
+    del io
+    del IO_HTTP
+    del pool
+    del requests
+    pool = socketpool.SocketPool(wifi.radio)
+    requests = adafruit_requests.Session(pool, ssl.create_default_context())
+    
     gc.collect() # running garbage collection
     print("* Free memory after last_4_val logic - "+str(gc.mem_free()))
     
@@ -215,17 +222,14 @@ try: # try statement encapsulates entire code
                 'url':pushalert_url
             }
             print("-- Trying to Send to PushAlert")
-            requests.post("https://api.pushalert.co/rest/v1/send",data=pushalert_data,headers=pushalert_headers)
-            '''
             try:
                 requests.post("https://api.pushalert.co/rest/v1/send",data=pushalert_data,headers=pushalert_headers)
                 print('-- PushAlert Sent')
             except Exception as error:
                 print('--- PushAlert Failed vvv')
-                print(error)
-            '''    
+                print(error) 
             gc.collect() # running garbage collection
-            print("* Free memory after sending to PushAlert- "+str(gc.mem_free()))
+            print("* Free memory after sending to PushAlert - "+str(gc.mem_free()))
             
     else:
         print("- No Notification this time")
@@ -245,3 +249,4 @@ except Exception as error: # any error anywhere in the code
     print(error)
     time.sleep(30)
     #remove_comment microcontroller.reset() # reboot pico
+
