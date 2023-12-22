@@ -1,12 +1,13 @@
 # Home Input Monitor (HIM)
 
-HIM monitors utility inputs to the home.
+HIM monitors utility inputs to the home. Designed to work with [wpm_d](https://github.com/kavinaidoo/wpm_d).
 
 ---
 
 ### Implemented Features
-* Water Pressure Monitoring
-* Sending data to Adafruit IO
+* Water Pressure Monitoring via connected sensor
+* Sending data to [Adafruit IO](https://io.adafruit.com/)
+* Sending push notifications using [ntfy](https://ntfy.sh/) and [PushAlert](https://pushalert.co/)
 
 ---
 
@@ -14,7 +15,7 @@ HIM monitors utility inputs to the home.
 1. Follow "Hardware Setup" and "Software Setup" sections [here](https://kavi.sblmnl.co.za/home-input-monitor-part-1-water-pressure)
 2. Download and unzip the latest release from [here](https://github.com/kavinaidoo/him/releases)
 3. Install the latest stable release of CircuitPython on your Pico ([Link](https://circuitpython.org/board/raspberry_pi_pico_w/))
-4. Create secrets.py and add in credentials ([Link](secrets_format.md))
+4. Create secrets.py and add in credentials ([Guide](secrets_format.md))
 5. Copy secrets.py and files from (2) to CIRCUITPY.
 6. Eject CIRCUITPY, disconnect from your computer and connect the Pico W to it's own power supply.
 7. Verify in Adafruit IO that you are seeing data sent to the appropriate feed in (4). By default, sends every 5 minutes.
