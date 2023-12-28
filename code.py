@@ -49,7 +49,7 @@ try: # try statement encapsulates entire code
     aio_username = secrets["aio_username"]
     aio_key = secrets["aio_key"]
     aio_data_feed_name = secrets["aio_data_feed_name"]
-    #aio_debug_feed_name = secrets["aio_debug_feed_name"]
+    aio_debug_feed_name = secrets["aio_debug_feed_name"]
     ntfy_topic = secrets["ntfy_topic"]
     pushalert_api_key = secrets["pushalert_api_key"]
     pushalert_icon_url = secrets["pushalert_icon_url"]
@@ -62,7 +62,8 @@ try: # try statement encapsulates entire code
 
     # ------ ADC -> Pressure
 
-    offset_v = 0.24 # Tune so that open to air it registers 0kpa for water pressure above air pressure
+    offset_v = 0.23 # Tune so that open to air it registers 0kpa for water pressure above air pressure
+    error_v = 0.15 # Voltage below this will signal an error, does not send to AIO, sends to ntfy
 
     pressure_pin = analogio.AnalogIn(board.A0) # sets up ADC 
     pressure_v = round((pressure_pin.value * 3.3)/65536,2) # ADC value to voltage
@@ -118,7 +119,9 @@ try: # try statement encapsulates entire code
     print("Trying to Send Data to AIO")
     try: # try to send data to AIO
         led.value = True  # Turn on the LED to indicate data is being sent.
-        send_io_data(aio_data_feed_name, f"{pressure_kpa:.2f}")
+        if pressure_v >= error_v:     
+            send_io_data(aio_data_feed_name, f"{pressure_kpa:.2f}")
+        send_io_data(aio_debug_feed_name, f"pressure_v: {pressure_v:.2f}")
         print("- Sending to AIO succeeded, waiting for 30s")
         time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
         led.value = False  # Turn off the LED to indicate data sending is complete.
@@ -132,7 +135,6 @@ try: # try statement encapsulates entire code
     offset_v = 0.24 # Tune so that open to air it registers 0kpa for water pressure above air pressure
 
     del pressure_pin
-    del pressure_v
     del pressure_kpa
     del voltage_pin
     del voltage
@@ -157,7 +159,11 @@ try: # try statement encapsulates entire code
     print("* Free memory after pulling last_4_full - "+str(gc.mem_free()))
     
     print("- Last 4 Values -> "+"["+",".join(map(str, last_4_val))+"]") 
-
+    
+    if pressure_v < error_v:
+        notification_text = "pressure_v under error_v, sensor error"
+        ntfy_headers = {"Tags": "red_circle", "Title": "WPM ERROR"}
+    
     if last_4_val[0] == 0 and last_4_val[1] > 0 and last_4_val[2] > 0 and last_4_val[3] > 0:
         # one zero and 3 above zero
         notification_text = "Water is back"
@@ -210,7 +216,7 @@ try: # try statement encapsulates entire code
             gc.collect() # running garbage collection
             print("* Free memory after sending to ntfy - "+str(gc.mem_free()))
             
-        if pushalert_api_key: # if pushalert_api_key has been defined
+        if pushalert_api_key and pushalert_title: # if pushalert_api_key has been defined
             pushalert_headers = {
                 'Authorization': 'api_key='+pushalert_api_key,
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -249,4 +255,3 @@ except Exception as error: # any error anywhere in the code
     print(error)
     time.sleep(30)
     microcontroller.reset() # reboot pico
-
