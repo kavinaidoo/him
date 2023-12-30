@@ -34,4 +34,4 @@ This project includes code from:
 * Adafruit - adafruit_requests library - [Link](https://github.com/adafruit/Adafruit_CircuitPython_Bundle) - MIT License
 * Adafruit - adafruit_minimqtt library - [Link](https://github.com/adafruit/Adafruit_CircuitPython_Bundle) - MIT License
 
-The full licenses for these can be found in [LICENSE.MD](LICENSE.MD)
+The full licenses for these can be found in [LICENSE.md](LICENSE.md)
