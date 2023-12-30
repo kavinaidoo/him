@@ -130,9 +130,6 @@ try: # try statement encapsulates entire code
         print("- Sending to AIO failed, resetting in 30s")
         time.sleep(30)
         microcontroller.reset() # reboot pico
-    
-    
-    offset_v = 0.24 # Tune so that open to air it registers 0kpa for water pressure above air pressure
 
     del pressure_pin
     del pressure_kpa
