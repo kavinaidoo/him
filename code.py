@@ -62,7 +62,7 @@ try: # try statement encapsulates entire code
 
     # ------ ADC -> Pressure
 
-    offset_v = 0.23 # Tune so that open to air it registers 0kpa for water pressure above air pressure
+    offset_v = 0.26 # Tune so that open to air it registers 0kpa for water pressure above air pressure
     error_v = 0.15 # Voltage below this will signal an error, does not send to AIO, sends to ntfy
 
     pressure_pin = analogio.AnalogIn(board.A0) # sets up ADC 
