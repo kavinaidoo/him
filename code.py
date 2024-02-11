@@ -54,6 +54,9 @@ try: # try statement encapsulates entire code
     pushalert_api_key = secrets["pushalert_api_key"]
     pushalert_icon_url = secrets["pushalert_icon_url"]
     pushalert_url = secrets["pushalert_url"]
+    pushalert_segment_id = secrets["pushalert_segment_id"]
+    device_location_id = secrets["device_location_id"]  
+    device_location_name = secrets["device_location_name"]
 
     gc.collect() # running garbage collection
     print("* Free memory after pulling secrets.py into variables - "+str(gc.mem_free()))
@@ -62,8 +65,8 @@ try: # try statement encapsulates entire code
 
     # ------ ADC -> Pressure
 
-    offset_v = 0.26 # Tune so that open to air it registers 0kpa for water pressure above air pressure
-    error_v = 0.15 # Voltage below this will signal an error, does not send to AIO, sends to ntfy
+    offset_v = secrets["device_offset_v"] # Tune so that open to air it registers 0kpa for water pressure above air pressure
+    error_v = secrets["device_error_v"] # Voltage below this will signal an error, does not send to AIO, sends to ntfy
 
     pressure_pin = analogio.AnalogIn(board.A0) # sets up ADC 
     pressure_v = round((pressure_pin.value * 3.3)/65536,2) # ADC value to voltage
@@ -121,9 +124,8 @@ try: # try statement encapsulates entire code
         led.value = True  # Turn on the LED to indicate data is being sent.
         if pressure_v >= error_v:     
             send_io_data(aio_data_feed_name, f"{pressure_kpa:.2f}")
-        send_io_data(aio_debug_feed_name, f"pressure_v: {pressure_v:.2f}")
-        print("- Sending to AIO succeeded, waiting for 30s")
-        time.sleep(30)  # Delay included to avoid data limit throttling on Adafruit IO.
+        send_io_data(aio_debug_feed_name, str(device_location_id)+" - "+f"pressure_v: {pressure_v:.2f}")
+        print("- Sending to AIO succeeded")
         led.value = False  # Turn off the LED to indicate data sending is complete.
         
     except Exception as error: # any error
@@ -145,7 +147,6 @@ try: # try statement encapsulates entire code
     notification_text = ""
     ntfy_headers = {}
     pushalert_title = ""
-    pushalert_message = ""
 
     last_4_full = io.receive_n_data(aio_data_feed_name,4) # pull last 4 values from AIO
     last_4_val = [float(x["value"]) for x in last_4_full] # stripping out just the values
@@ -158,32 +159,32 @@ try: # try statement encapsulates entire code
     print("- Last 4 Values -> "+"["+",".join(map(str, last_4_val))+"]") 
     
     if pressure_v < error_v:
-        notification_text = "pressure_v under error_v, sensor error"
+        notification_text = "pressure_v < error_v, sensor error"
         ntfy_headers = {"Tags": "red_circle", "Title": "WPM ERROR"}
     
     if last_4_val[0] == 0 and last_4_val[1] > 0 and last_4_val[2] > 0 and last_4_val[3] > 0:
         # one zero and 3 above zero
         notification_text = "Water is back"
-        ntfy_headers = {"Tags": "yellow_circle", "Title": "WPM"}
-        pushalert_title = '🟡WPM'
+        ntfy_headers = {"Tags": "yellow_circle", "Title": "WPM"+" - "+ device_location_name}
+        pushalert_title = '🟡WPM' +" - "+ device_location_name
 
     if last_4_val[0] <= 100 and last_4_val[1] > 100 and last_4_val[2] > 100 and last_4_val[3] > 100:
         # one below 100 and 3 above 100
-        notification_text = "Normal Pressure resumed"
-        ntfy_headers = {"Tags": "green_circle", "Title": "WPM"}
-        pushalert_title = '🟢WPM'
+        notification_text = "Normal Pressure Resumed"
+        ntfy_headers = {"Tags": "green_circle", "Title": "WPM"+" - "+ device_location_name}
+        pushalert_title = '🟢WPM' +" - "+ device_location_name
 
     if last_4_val[0] >= 100 and last_4_val[1] < 100 and last_4_val[2] < 100 and last_4_val[3] < 100:
         # one above 100 and 3 below 100
         notification_text = "Dropped below Normal Pressure"
-        ntfy_headers = {"Tags": "yellow_circle", "Title": "WPM"}
-        pushalert_title = '🟡WPM'
+        ntfy_headers = {"Tags": "yellow_circle", "Title": "WPM"+" - "+ device_location_name}
+        pushalert_title = '🟡WPM' +" - "+ device_location_name
 
     if last_4_val[0] > 0 and last_4_val[1] == 0 and last_4_val[2] == 0 and last_4_val[3] == 0:
         # one above 100 and 3 below 100
         notification_text = "Water Stopped Completely"
-        ntfy_headers = {"Tags": "red_circle", "Title": "WPM"}
-        pushalert_title = '🔴WPM'
+        ntfy_headers = {"Tags": "red_circle", "Title": "WPM"+" - "+ device_location_name}
+        pushalert_title = '🔴WPM' +" - "+device_location_name
     
     del last_4_val
     del io
@@ -226,7 +227,7 @@ try: # try statement encapsulates entire code
             }
             print("-- Trying to Send to PushAlert")
             try:
-                requests.post("https://api.pushalert.co/rest/v1/send",data=pushalert_data,headers=pushalert_headers)
+                requests.post("https://api.pushalert.co/rest/v1/segment/"+str(pushalert_segment_id)+"/send",data=pushalert_data,headers=pushalert_headers)
                 print('-- PushAlert Sent')
             except Exception as error:
                 print('--- PushAlert Failed vvv')
