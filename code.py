@@ -4,6 +4,8 @@
 
 # --------------- Copyright
 
+# Copyright 2024 Kavi Naidoo. Full license text can be found in LICENSE.md
+
 # This code is a modification of https://github.com/adafruit/Adafruit_Learning_System_Guides/blob/main/WiFi_Mailbox_Notifier/mailbox_code/code.py
 # Which contained the following text:
 
