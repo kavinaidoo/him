@@ -161,7 +161,7 @@ try: # try statement encapsulates entire code
     print("- Last 4 Values -> "+"["+",".join(map(str, last_4_val))+"]") 
     
     if pressure_v < error_v:
-        notification_text = "pressure_v < error_v, sensor error"
+        notification_text = "pressure_v < error_v, sensor error on "+device_location_name
         ntfy_headers = {"Tags": "red_circle", "Title": "WPM ERROR"}
     
     if last_4_val[0] == 0 and last_4_val[1] > 0 and last_4_val[2] > 0 and last_4_val[3] > 0:
